@@ -14,3 +14,21 @@
 - Diagnostic
 - Error Handling
 - Host on HTTPs
+
+# Namaste Food
+
+/\*\*
+
+- Header
+- - Logo
+- - Nav Items
+- Body
+- -Search
+- -ResturantContainer
+- -ResturantCard
+- Footer
+- -Copyright
+- -Links
+- -Address
+- -Contact
+  \*/
