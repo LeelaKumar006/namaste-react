@@ -1,48 +1,71 @@
-import { useState } from "react";
-import resList from "../utils/mockData";
+import { useEffect, useState } from "react";
 import ResturantCard from "./ResturantCard";
+import Shimmer from "./Shimmer";
 
 const Body = () => {
-  const [topRestaurants, setTopRestaurants] = useState(resList);
+  const [topRestaurants, setTopRestaurants] = useState([]);
   const [search, setSearch] = useState("");
+  const [filteredRestaurants, setFilteredRestaurants] = useState([]);
   const clickHandler = () => {
-    setTopRestaurants(() =>
-      topRestaurants.filter((res) => res.data.avgRating > 4)
+    setFilteredRestaurants(() =>
+      topRestaurants.filter((res) => res.info.avgRating > 4)
     );
   };
 
   const changeHandler = (e) => {
     setSearch(e.target.value);
   };
-  return (
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const fetchData = async () => {
+    const data = await fetch(
+      "https://www.swiggy.com/dapi/restaurants/list/v5?lat=17.37240&lng=78.43780&is-seo-homepage-enabled=true&page_type=DESKTOP_WEB_LISTING"
+    );
+    const json = await data.json();
+    setTopRestaurants(
+      json?.data?.cards[1]?.card?.card?.gridElements?.infoWithStyle?.restaurants
+    );
+    setFilteredRestaurants(
+      json?.data?.cards[1]?.card?.card?.gridElements?.infoWithStyle?.restaurants
+    );
+  };
+
+  return topRestaurants.length === 0 ? (
+    <Shimmer />
+  ) : (
     <div className="body">
-      <div className="search">
-        <input
-          type="text"
-          placeholder="serach"
-          onChange={changeHandler}
-          value={search}
-        />
-        <div className="search-btn">
-          <button
-            onClick={() =>
-              setTopRestaurants(
-                topRestaurants.filter((res) =>
-                  res.data.name.toLowerCase().includes(search.toLowerCase())
+      <div className="filter">
+        <div className="search">
+          <input
+            className="search-box"
+            type="text"
+            placeholder="serach"
+            onChange={changeHandler}
+            value={search}
+          />
+          <div className="search-btn">
+            <button
+              onClick={() =>
+                setFilteredRestaurants(
+                  topRestaurants.filter((res) =>
+                    res.info.name.toLowerCase().includes(search.toLowerCase())
+                  )
                 )
-              )
-            }
-          >
-            Search
-          </button>
+              }
+            >
+              Search
+            </button>
+          </div>
+        </div>
+        <div className="res-btn">
+          <button onClick={clickHandler}>Top Resturants</button>
         </div>
       </div>
-      <div className="res-btn">
-        <button onClick={clickHandler}>Top Resturants</button>
-      </div>
       <div className="res-container">
-        {topRestaurants.map((restaurants) => (
-          <ResturantCard key={restaurants.data.id} resData={restaurants} />
+        {filteredRestaurants.map((restaurants) => (
+          <ResturantCard key={restaurants.info.id} resData={restaurants} />
         ))}
       </div>
     </div>
