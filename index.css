@@ -66,3 +66,6 @@
 .filter {
   display: flex;
 }
+.err_data {
+  color: red;
+}
